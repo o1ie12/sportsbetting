@@ -54,9 +54,17 @@ test/smoke.js    end-to-end logic test on a throwaway DB (npm test)
 
 ## Prediction-market features
 
-- **Prices in cents.** Every price can show as cents (default), American or Decimal odds. Change it from the username menu. A price in cents is the implied chance, including the house margin, so Yes and No add to a little over 100.
+- **Prices in dollars.** Every price shows as dollars by default (58 cents reads $0.58), or as American or Decimal odds. Change it from the username menu. A dollar price is the implied chance, including the house margin, so Yes and No add to a little over $1.00.
 - **Markets tab.** Anyone can ask a yes or no question ("Will Oliver be late Friday?"). Prices come from an LMSR market maker (`lib/market.js`, liquidity 300), start at 50 cents and move as friends buy. A winning share pays $1. You can sell shares back before trading closes. The creator or the commissioner settles it as Yes, No or Void (void refunds net spend). Each person can have 3 open markets.
 - **Price charts.** Each game has a win-probability chart built from stored price history (`price_hist` table); each market charts its own trades. Hover or drag across a chart to read a price.
 - **Portfolio.** Cash, value in positions and profit, with open tickets and market positions together. Leaderboard net worth includes market positions at their current price.
 - **Volume.** Games show the money bet on them.
 - **Analytics.** Portfolio shows net worth over time (1D, 1W, All) and profit by day with win rate and ROI. Leaders shows everyone's net worth on one chart and profit bars. Net worth is snapshotted every 5 minutes into `net_hist`.
+
+## Run it from your computer
+
+```
+npm run share
+```
+
+Starts the server, opens a free Cloudflare tunnel, prints a link and the invite code to send friends, and keeps a Mac awake while it runs. Ctrl+C stops everything. The link changes each time you start it. Your data stays in `data/courtside.db`.

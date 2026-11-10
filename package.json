@@ -5,8 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node test/smoke.js && node test/poker.js"
+    "test": "node test/smoke.js && node test/poker.js",
+    "share": "node scripts/share.js"
   },
-  "engines": { "node": ">=22.13" },
+  "engines": {
+    "node": ">=22.13"
+  },
   "license": "MIT"
 }

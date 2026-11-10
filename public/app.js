@@ -6,10 +6,11 @@ const money = (n) => Math.round(n).toLocaleString('en-US');
 const usd = (n) => (n < 0 ? '-$' : '$') + money(Math.abs(n));
 const dec = (a) => (a > 0 ? 1 + a / 100 : 1 + 100 / -a);
 const clampC = (x) => Math.max(1, Math.min(99, Math.round(x)));
-const am = (o) => (o == null ? '–' : S.fmt === 'cents' ? `${clampC(100 / dec(o))}¢` : S.fmt === 'dec' ? dec(o).toFixed(2) : o > 0 ? `+${o}` : `${o}`);
-const c100 = (p) => `${clampC(p * 100)}¢`;
+const px = (n) => `$${(n / 100).toFixed(2)}`;
+const am = (o) => (o == null ? '–' : S.fmt === 'cents' ? px(clampC(100 / dec(o))) : S.fmt === 'dec' ? dec(o).toFixed(2) : o > 0 ? `+${o}` : `${o}`);
+const c100 = (p) => px(clampC(p * 100));
 const fl = (l) => (l > 0 ? `+${l}` : l === 0 ? 'PK' : `${l}`);
-const decToAm = (d) => (S.fmt === 'cents' ? `${clampC(100 / d)}¢` : S.fmt === 'dec' ? d.toFixed(2) : d >= 2 ? `+${Math.round((d - 1) * 100)}` : `${Math.round(-100 / (d - 1))}`);
+const decToAm = (d) => (S.fmt === 'cents' ? px(clampC(100 / d)) : S.fmt === 'dec' ? d.toFixed(2) : d >= 2 ? `+${Math.round((d - 1) * 100)}` : `${Math.round(-100 / (d - 1))}`);
 const boostFor = (n) => (n >= 7 ? 30 : n === 6 ? 25 : n === 5 ? 20 : n === 4 ? 15 : n === 3 ? 10 : 0);
 const volFmt = (n) => (n >= 1000 ? `$${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K` : `$${Math.round(n)}`);
 const until = (ts) => {
@@ -348,7 +349,7 @@ function slipCalc() {
 function slipRows(c) {
   if (!c.stake || !(c.mode === 'parlay' || c.n === 1)) return '';
   const payout = c.stake + c.win;
-  return `<div class="sum"><span>Avg price</span><b>${clampC((c.stake / payout) * 100)}¢</b></div><div class="sum"><span>Shares</span><b>${money(payout)}</b></div><div class="sum"><span>Payout if it hits</span><b>${usd(payout)}</b></div>`;
+  return `<div class="sum"><span>Avg price</span><b>${px(clampC((c.stake / payout) * 100))}</b></div><div class="sum"><span>Shares</span><b>${money(payout)}</b></div><div class="sum"><span>Payout if it hits</span><b>${usd(payout)}</b></div>`;
 }
 function slipView() {
   const d = S.data, c = slipCalc();
@@ -399,7 +400,7 @@ function newMarketForm() {
     <div class="field"><label>Details (optional)</label><input name="detail" maxlength="300" placeholder="How it resolves"></div>
     <div class="two"><div class="field"><label>Trading closes in</label><select name="hours"><option value="1">1 hour</option><option value="6">6 hours</option><option value="24" selected>1 day</option><option value="72">3 days</option><option value="168">1 week</option><option value="720">30 days</option></select></div>
     <div class="field"><label>&nbsp;</label><button class="btn">Create market</button></div></div>
-    <div class="note">You settle this market when it ends. Price starts at 50¢.</div></form>`;
+    <div class="note">You settle this market when it ends. Price starts at $0.50.</div></form>`;
 }
 function quote(m) {
   const t = S.mt, side = t.side;
@@ -416,7 +417,7 @@ function quote(m) {
 function quoteHtml(m) {
   const q = quote(m), S2 = S.mt.side.toUpperCase();
   if (!q.ok) return `<div class="note">${S.mt.kind === 'buy' ? 'Enter an amount of at least $10.' : 'Choose how much to sell.'}</div>`;
-  if (S.mt.kind === 'buy') return `<div class="sum"><span>Avg price</span><b>${clampC(q.avg * 100)}¢</b></div><div class="sum"><span>Shares</span><b>${money(q.sh)}</b></div><div class="sum"><span>Payout if ${S2}</span><b class="win">${usd(q.payout)}</b></div><div class="sum"><span>Return</span><b class="win">+${Math.round(q.ret * 100)}%</b></div>`;
+  if (S.mt.kind === 'buy') return `<div class="sum"><span>Avg price</span><b>${px(clampC(q.avg * 100))}</b></div><div class="sum"><span>Shares</span><b>${money(q.sh)}</b></div><div class="sum"><span>Payout if ${S2}</span><b class="win">${usd(q.payout)}</b></div><div class="sum"><span>Return</span><b class="win">+${Math.round(q.ret * 100)}%</b></div>`;
   return `<div class="sum"><span>Shares sold</span><b>${money(q.sh)}</b></div><div class="sum"><span>You receive</span><b class="win">${usd(q.get)}</b></div>`;
 }
 function tradeBtnState(m) {
@@ -681,7 +682,7 @@ function pokerActionsHtml(v, me) {
   const inHand = ['preflop', 'flop', 'turn', 'river'].includes(v.stage);
   const msg = v.stage === 'showdown' ? 'Next hand starts in a moment.' : v.stage === 'waiting' ? 'Waiting for another player. Add a bot or invite a friend.' : me.folded ? 'You folded this hand.' : acting ? `Waiting for ${esc(acting.name)}.` : '';
   const free = v.seats.some((s, i) => !s) ;
-  return `<div class="pkact"><div class="note">${msg}</div>${!inHand || !me.dealt ? `<div class="pkbar">${me.stack < v.maxBuy ? '<button class="btn sm line" data-act="pkrebuy">Add chips</button>' : ''}${free ? '<button class="btn sm line" data-act="pkbot">Add bot</button>' : ''}</div>` : ''}</div>`;
+  return `<div class="pkact"><div class="note">${msg}</div>${!inHand || !me.dealt ? `<div class="pkbar">${me.stack < v.maxBuy ? '<button class="btn sm line" data-act="pkrebuy">Add cash</button>' : ''}${free ? '<button class="btn sm line" data-act="pkbot">Add bot</button>' : ''}</div>` : ''}</div>`;
 }
 function pokerTableHtml() {
   const v = S.pk.view;
@@ -815,7 +816,7 @@ function renderModal() {
   const segOf = (act, cur, items) => `<div class="seg block" style="margin:0">${items.map(([v, l]) => `<button class="${cur === v ? 'on' : ''}" data-act="${act}" data-v="${v}">${l}</button>`).join('')}</div>`;
   el.innerHTML = `<div class="modal" data-stop="1"><h3>${esc(d.me.username)}</h3>
     <div class="mid">Invite code for friends joining ${esc(location.host)}:</div><div class="code">${esc(d.invite)}</div>
-    <div class="field"><label>Price format</label>${segOf('fmt', S.fmt, [['cents', 'Cents'], ['am', 'American'], ['dec', 'Decimal']])}</div>
+    <div class="field"><label>Price format</label>${segOf('fmt', S.fmt, [['cents', 'Dollars'], ['am', 'American'], ['dec', 'Decimal']])}</div>
     <div class="field"><label>Theme</label>${segOf('theme', S.theme, [['dark', 'Dark'], ['light', 'Light']])}</div>
     <div style="display:grid;gap:8px;margin-top:14px"><button class="btn" data-act="copyinvite">Copy invite message</button>
     ${d.me.can_bailout ? `<button class="btn line" data-act="bailout">Take a bailout (+$2,500)</button>` : ''}

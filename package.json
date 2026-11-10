@@ -1,0 +1,12 @@
+{
+  "name": "courtside-nba-betting",
+  "version": "0.1.0",
+  "description": "Fake-money NBA betting app for you and your friends",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/smoke.js && node test/poker.js"
+  },
+  "engines": { "node": ">=22.13" },
+  "license": "MIT"
+}
